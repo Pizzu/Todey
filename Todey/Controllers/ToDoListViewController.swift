@@ -9,12 +9,15 @@
 import UIKit
 import RealmSwift
 import SwipeCellKit
+import ChameleonFramework
 
 class ToDoListViewController: UITableViewController {
 
     var itemArray : Results<Item>?
     
     let realm = try! Realm()
+    
+    @IBOutlet weak var searchBar: UISearchBar!
     
     //chiamiamo loadItems quando siamo sicuri di avere la nostra categoria
     var selectedCategory : Category? {
@@ -26,9 +29,38 @@ class ToDoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.rowHeight = 80.0
-
+        tableView.separatorStyle = .none
+         navigationController?.navigationBar.tintColor = UIColor(hexString: selectedCategory!.colorCategory)
     }
-
+    //Dopo che il navigation controller è stato stabilito
+    override func viewWillAppear(_ animated: Bool) {
+        if let colorHex = selectedCategory?.colorCategory {
+            
+            //Titolo del navigation controller
+            title = selectedCategory!.name
+            searchBar.barTintColor = UIColor(hexString: colorHex)
+            updateNavBar(withHexCode: colorHex)
+            
+        }
+    }
+    //Chiamata quando la view sta per essere rimossa della gerarchia della navigazione
+    override func viewWillDisappear(_ animated: Bool) {
+        updateNavBar(withHexCode: "1D9BF6")
+    }
+    
+    //MARK: - NavBar Setup
+    func updateNavBar(withHexCode colorHexCode: String){
+        guard let navBar = navigationController?.navigationBar else {fatalError("Navigation Controller does not exist.")}
+        
+        if let navBarColor = UIColor(hexString : colorHexCode) {
+            
+            navBar.barTintColor = navBarColor
+            navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+            navBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true) ]
+            
+        }
+    }
+    
     //MARK: - Tableview Datasource Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
@@ -42,13 +74,21 @@ class ToDoListViewController: UITableViewController {
         
         cell.delegate = self
         
-        if let item = itemArray?[indexPath.row]{
+        if let item = itemArray?[indexPath.row] {
         
-        cell.textLabel?.text = item.title
-        
-        //Possiamo usare il ternary operator
-        //value = condition ? valueIfTrue : valueIfFalse
-        cell.accessoryType = item.done == true ? .checkmark : .none // potremmo togliere anche il == true
+            cell.textLabel?.text = item.title
+            
+            if let category = selectedCategory {
+                if let color = UIColor(hexString : category.colorCategory)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(itemArray!.count)) {
+                    cell.backgroundColor = color
+                    cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+                    
+                }
+            }
+            
+            //Possiamo usare il ternary operator
+            //value = condition ? valueIfTrue : valueIfFalse
+            cell.accessoryType = item.done == true ? .checkmark : .none // potremmo togliere anche il == true
             
         } else {
             cell.textLabel?.text = "No Items Added"
@@ -117,7 +157,7 @@ class ToDoListViewController: UITableViewController {
     
     func loadItems(){
         
-        itemArray = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+        itemArray = selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: true)
         
         tableView.reloadData()
 
