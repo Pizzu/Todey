@@ -91,6 +91,10 @@ class CategoryTableViewController: UITableViewController {
             textField = alertTextField
         }
         
+        let dismissAction = UIAlertAction(title: "Cancel", style: .default) {(action) in alert.dismiss(animated: true, completion: nil)}
+        
+        alert.addAction(dismissAction)
+        
         present(alert, animated: true, completion: nil)
         
     }

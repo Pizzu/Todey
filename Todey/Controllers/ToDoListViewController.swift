@@ -126,7 +126,6 @@ class ToDoListViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add item", style: .default) { (action) in
-            
             if let currentCategory = self.selectedCategory {
                 do{
                     try self.realm.write{
@@ -149,6 +148,11 @@ class ToDoListViewController: UITableViewController {
             textField = alertTextField
         }
         alert.addAction(action)
+        
+        let dismissAction = UIAlertAction(title: "Cancel", style: .default) {(action) in alert.dismiss(animated: true, completion: nil)}
+        
+        alert.addAction(dismissAction)
+        
         present(alert, animated: true, completion: nil)
 
     }
