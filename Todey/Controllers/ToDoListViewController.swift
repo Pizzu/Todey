@@ -34,6 +34,7 @@ class ToDoListViewController: UITableViewController {
     }
     //Dopo che il navigation controller è stato stabilito
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         if let colorHex = selectedCategory?.colorCategory {
             
             //Titolo del navigation controller
@@ -45,6 +46,7 @@ class ToDoListViewController: UITableViewController {
     }
     //Chiamata quando la view sta per essere rimossa della gerarchia della navigazione
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         updateNavBar(withHexCode: "1D9BF6")
     }
     
@@ -57,7 +59,6 @@ class ToDoListViewController: UITableViewController {
             navBar.barTintColor = navBarColor
             navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
             navBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true) ]
-            
         }
     }
     
